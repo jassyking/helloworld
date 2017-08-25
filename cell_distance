@@ -1,0 +1,152 @@
+// Cell.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+
+class Position
+{
+private:
+	int x, y, z;
+	static int _maxValue;
+public:
+
+	static int SetRange(int val)
+	{
+		if (val>0 && val<=100000)
+		{
+			_maxValue = val;
+			return 0;
+		}
+		return -1;
+	}
+
+	static bool BetweenRange(int val)
+	{
+		return (0<val) && (val<=_maxValue);
+	}
+
+    Position(int val):x(0),y(0),z(0)
+    {
+        int i = 0, v = 1;
+		//get i
+
+        for (; v<val; v+=6*(++i))
+		{
+			;
+		}
+
+        //get x,y,z;
+        if(i > 0)
+        {
+            int step = (v-val)%i;
+
+            switch ((v-val)/i)
+            {
+				case 0: 
+					x = i; y = -i+step; z = x+y;
+					break;
+				case 1: 
+					z = i; y = step; x = z-y;
+					break;
+				case 2: 
+					y = i; z = i-step; x = z-y;
+					break;
+				case 3: 
+					x = -i; y = i-step; z = x+y;
+					break;
+				case 4: 
+					z = -i; y = -step; x = z-y;
+					break;
+				case 5: 
+					y = -i; z = -i+step; x = z-y;
+					break;
+				default: 
+					break;
+            }
+        }
+    }
+
+#define MyAbs(a,b) ((a)>(b)?((a)-(b)):((b)-(a)))
+#define MyMax(a,b) ((a)>(b)?(a):(b))
+
+    int operator - (const Position &p) const
+    {
+        //int i = x>p.x ? x-p.x : p.x-x;
+        //int j = y>p.y ? y-p.y : p.y-y;
+        //int k = z>p.z ? z-p.z : p.z-z;
+        //return i>j ? (i>k?i:k) : (j>k?j:k);
+
+		int dx = MyAbs(x,p.x);
+		int dy = MyAbs(y,p.y);
+		int dz = MyAbs(z,p.z);
+		return dx>dy?MyMax(dx,dz):MyMax(dy,dz);
+
+    }
+
+};
+
+int Position::_maxValue = 0;
+
+
+/************************************************************************
+Description  : 初始化蜂窝小区信息
+Prototype    : void InitCellularDistrict(int iMaxSeqValue)
+               Input Param  :iMaxSeqValue 蜂窝小区的最大值编号，注：编号从1开始
+               Output Param : 无
+               Return Value : 成功返回0，失败返回-1
+/************************************************************************/
+int InitCellularDistrict(int iMaxSeqValue)
+{
+    return Position::SetRange(iMaxSeqValue);
+}
+
+
+/************************************************************************
+Description  : 计算出蜂窝小区指定两点（编号值）之间的最短距离
+Prototype    : int GetShortestPathLength(int iFirstValue, intiSecondValue)
+               Input Param  :iFirstValue 起点编号值， iSecondValue 终点编号值
+               Output Param : 无
+               Return Value : 计算成功返回最短距离，失败返回-1
+/************************************************************************/
+int GetShortestPathLength(int iFirstValue, int iSecondValue)
+{
+    if (Position::BetweenRange(iFirstValue)
+		&& Position::BetweenRange(iSecondValue)
+		)
+    {
+		return Position(iFirstValue)-Position(iSecondValue);
+    }
+    return -1;
+}
+
+
+/************************************************************************
+Description  : 清空相关信息
+Prototype    : void Clear()
+               Input Param  : 无
+               Output Param : 无
+               Return Value : 无
+/************************************************************************/
+void Clear()
+{
+    Position::SetRange(0);
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	char c;
+	InitCellularDistrict(100000);
+	if (GetShortestPathLength(1,2)==1) printf("ok1\n");
+	if(GetShortestPathLength(1,3)==1) printf("ok2\n");
+	if(GetShortestPathLength(1,7)==1) printf("ok3\n");
+	if(GetShortestPathLength(2,2)==0) printf("ok4\n");
+	if(GetShortestPathLength(20,2)==2) printf("ok5\n");
+	if(GetShortestPathLength(19,30)==5) printf("ok6\n");
+	if(GetShortestPathLength(1,53)==4) printf("ok7\n");
+	if(GetShortestPathLength(31,58)==4)  printf("ok8\n");
+	if(GetShortestPathLength(46,60)==8)  printf("ok9\n");
+
+	scanf("%c",&c);
+	return 0;
+}
+
