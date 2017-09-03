@@ -1,0 +1,376 @@
+#include "stdafx.h"
+
+#include <iostream>
+#include <list>
+#include <algorithm>
+
+using namespace std;
+
+#define LEN 10
+#define NIL -1
+
+
+bool m[LEN][LEN];
+enum COLOR {WHITE, GRAY, BLACK};
+
+COLOR color[LEN];
+int d[LEN];
+int p[LEN];
+int t;
+int f[LEN];
+
+list<int> topolist;
+
+void DFS_VISIT(int u){
+  color[u] = GRAY;
+  t++;
+  d[u] = t;
+  
+  int i;
+  for(i=0;i<LEN;++i){
+    if(m[u][i] == true){
+      if(color[i] == WHITE){
+    p[i] = u;
+    DFS_VISIT(i);
+      }
+    }
+  }
+  color[u] = BLACK;
+  f[u] = t = t +1;
+  topolist.push_front(u);
+  //cout<<u<<endl;
+}
+
+
+void DFS(){
+  int i;
+  for(i=0;i<LEN;++i){
+    color[i] = WHITE;
+    p[i] = NIL;
+  }
+  t = 0;
+  for(i=0;i<LEN;++i)
+    if(color[i] == WHITE)
+      DFS_VISIT(i);
+}
+
+void printPath(int s, int v){
+  if(v == s)
+    cout<<s<<endl;
+  else if(p[v] == NIL){
+    cout<<"No path exists"<<endl;
+    return ;
+  }
+  else{
+    printPath(s, p[v]);
+    cout<<v<<endl;
+  }
+}
+
+void  topological_sort(){
+  DFS();  
+}
+
+void print(int s){
+  cout<<s<<endl;
+}
+int _tmain(int argc, _TCHAR* argv[])
+    
+  int i,j;
+  for(i=0;i<LEN;++i){
+    for(j=0;j<LEN;++j){
+      m[i][j] = false;
+    }
+  }
+
+  m[0][2] = true;  m[2][0] = true;
+  m[1][7] = true;  m[7][1] = true;
+  m[2][7] = true;  m[7][2] = true;
+  m[2][4] = true;  m[4][2] = true;
+  m[7][3] = true;  m[3][7] = true;
+  m[3][4] = true;  m[4][3] = true;
+  m[4][5] = true;  m[5][4] = true;
+  m[5][8] = true;  m[8][5] = true;
+  m[8][6] = true;  m[6][8] = true;
+  m[8][9] = true;  m[9][8] = true;
+
+  //DFS();
+
+  //printPath(0, 9);
+  topological_sort();
+  
+  for_each(topolist.begin(), topolist.end(), print);
+  return 0;
+}
+
+
+
+#define LEN 10
+#define INFINITE 100
+#define NIL -1
+
+
+bool m[LEN][LEN];
+enum COLOR {WHITE, GRAY, BLACK};
+
+COLOR color[LEN];
+int d[LEN];
+int p[LEN];
+
+
+//广度优先遍历算法， 借助一个队列+着色标记实现
+void BFS(int s){
+  int i;
+  for(i=0;i<LEN;++i){
+    color[i] = WHITE;
+    d[i] = INFINITE;
+    p[i] = NIL;
+  }
+
+  color[s] = GRAY;
+  d[s] = 0;
+  p[s] = NIL;
+
+  queue<int> Q;
+  Q.push(s);
+  while(!Q.empty()){
+    int u = Q.front();
+    cout<<u<<endl;
+    Q.pop();
+    
+    //Access all vertices next to u
+    int j;
+    for(j=0;j<LEN;++j){
+      if(m[u][j] == true){
+    if(color[j] == WHITE){
+      color[j] = GRAY;
+      d[j] = d[u] + 1;
+      p[j] = u;
+      Q.push(j);
+    }
+      }
+    }
+    color[u] = BLACK;
+  }
+}
+int main(){
+  
+  
+  int i,j;
+  for(i=0;i<LEN;++i){
+    for(j=0;j<LEN;++j){
+      m[i][j] = false;
+    }
+  }
+
+  m[0][2] = true;  m[2][0] = true;
+  m[1][7] = true;  m[7][1] = true;
+  m[2][7] = true;  m[7][2] = true;
+  m[2][4] = true;  m[4][2] = true;
+  m[7][3] = true;  m[3][7] = true;
+  m[3][4] = true;  m[4][3] = true;
+  m[4][5] = true;  m[5][4] = true;
+  m[5][8] = true;  m[8][5] = true;
+  m[8][6] = true;  m[6][8] = true;
+  m[8][9] = true;  m[9][8] = true;
+
+  BFS(0);
+
+  return 0;
+}
+
+
+    static class Vexnode
+    {
+        int index;
+        List<Vexnode> list;
+    }
+
+    public static void findPath(Vexnode curNode,Vexnode endNode,boolean visited[],Stack<Integer> stack)
+    {
+        if(curNode==null || visited[curNode.index]==true)   //假如当前点已经访问过，就返回
+            return;
+        stack.push(curNode.index);//当前点入栈
+        visited[curNode.index]=true;//当前点已经访问
+        if(curNode.index==endNode.index)//如果当前点是目标点，输出
+        {
+            System.out.println(getMessage(stack));
+            visited[curNode.index]=false;
+            stack.pop();
+            return;
+        }
+        List<Vexnode> list=curNode.list;//当前点链表
+        for(int i=0;i<list.size();i++)//对相连的每个顶点进行搜索
+        {
+            findPath(list.get(i), endNode, visited, stack);
+        }
+        visited[curNode.index]=false;//搜索完毕后弹出，标志清除
+        stack.pop();
+    }
+    
+    private static String getMessage(Stack<Integer> stack)
+    {
+        Iterator<Integer> iterator=stack.iterator();
+        String messageString="";
+        while(iterator.hasNext())
+        {
+            messageString+=iterator.next()+"->";
+        }
+        if(stack.size()==0)
+            return messageString;
+        return messageString.substring(0,messageString.length()-2);
+    }
+
+
+Dsj:
+	const int  MAXINT = 32767;
+const int MAXNUM = 10;
+int dist[MAXNUM];
+int prev[MAXNUM];
+
+int A[MAXUNM][MAXNUM];
+
+void Dijkstra(int v0)
+{
+  　　bool S[MAXNUM];                                  // 判断是否已存入该点到S集合中
+      int n=MAXNUM;
+  　　for(int i=1; i<=n; ++i)
+ 　　 {
+      　　dist[i] = A[v0][i];
+      　　S[i] = false;                                // 初始都未用过该点
+      　　if(dist[i] == MAXINT)    
+            　　prev[i] = -1;
+ 　　     else 
+            　　prev[i] = v0;
+   　　}
+   　 dist[v0] = 0;
+   　 S[v0] = true; 　　
+ 　　 for(int i=2; i<=n; i++)
+ 　　 {
+       　　int mindist = MAXINT;
+       　　int u = v0; 　　                            // 找出当前未使用的点j的dist[j]最小值
+      　　 for(int j=1; j<=n; ++j)
+      　　    if((!S[j]) && dist[j]<mindist)
+      　　    {
+         　　       u = j;                             // u保存当前邻接点中距离最小的点的号码 
+         　 　      mindist = dist[j];
+       　　   }
+       　　S[u] = true; 
+       　　for(int j=1; j<=n; j++)
+       　　    if((!S[j]) && A[u][j]<MAXINT)
+       　　    {
+           　    　if(dist[u] + A[u][j] < dist[j])     //在通过新加入的u点路径找到离v0点更短的路径  
+           　    　{
+                   　　dist[j] = dist[u] + A[u][j];    //更新dist 
+                   　　prev[j] = u;                    //记录前驱顶点 
+            　　    }
+        　    　}
+   　　}
+}
+
+FLoyd:
+typedef struct          
+{        
+    char vertex[VertexNum];                                //顶点表         
+    int edges[VertexNum][VertexNum];                       //邻接矩阵,可看做边表         
+    int n,e;                                               //图中当前的顶点数和边数         
+}MGraph; 
+
+void Floyd(MGraph g)
+{
+ 　　int A[MAXV][MAXV];
+ 　　int path[MAXV][MAXV];
+ 　　int i,j,k,n=g.n;
+ 　　for(i=0;i<n;i++)
+    　　for(j=0;j<n;j++)
+    　　{ 　　
+             A[i][j]=g.edges[i][j];
+         　　 path[i][j]=-1;
+     　 }
+ 　　for(k=0;k<n;k++)
+ 　　{ 
+      　　for(i=0;i<n;i++)
+         　　for(j=0;j<n;j++)
+             　　if(A[i][j]>(A[i][k]+A[k][j]))
+             　　{
+                   　　A[i][j]=A[i][k]+A[k][j];
+                   　　path[i][j]=k;
+              　 } 
+    　} 
+} 
+
+//tanxin
+float knapsack(float c,float w[MAXNUM], float v[MAXNUM],float con[MAXNUM])
+{
+      int n=MAXNUM;
+      float d[n],hascon=0,remain=c;
+
+      int i;
+      for (i = 0; i < n; i++) 
+          d[i] = v[i]/w[i];                      //算出每个物品的平均价值
+
+      sort(d,w,v,n);                             //按照平均价值对w,v进行排列，详细代码略
+
+      for (i=0;i<n;i++)
+          con[i]=0;                              //con记录第i个物品完整度，如果为0，未装入，如果为1整体装入 0，1之间装入部分
+
+      for (i=0;i<n;i++) 
+      {
+          if (w[i]>remain )                      //如果第i个物品无法整体装进保 则跳出循环
+                break;
+          con[i]=1;
+          hascon+=v[i]                           //累加装进包的物品总价值
+          remain-=w[i];                          
+      }
+      if (i<n)
+      {
+           con[i]=remain/w[i];                   //计算包中剩余部分还能容纳多少价值 
+           hascon+=con[i]*v[i];
+       }
+
+      return hascon;                             
+}
+http://www.cnblogs.com/chenhuan001/category/452080.html
+
+#define M 5010//题目中可能的最大点数
+int STACK[M],top=0;//Tarjan算法中的栈
+bool InStack[M];//检查是否在栈中
+int DFN[M];//深度优先搜索访问次序
+ 
+int Low[M];//能追溯到的最早的次序
+int ComponentNumber=0;//有向图强连通分量个数
+int Index=0;//索引号
+vector<int> Edge[M];//邻接表表示
+vector<int> Component[M];//获得强连通分量结果
+int InComponent[M];//记录每个点在第几号强连通分量里
+int ComponentDegree[M];//记录每个强连通分量的度
+ 
+void Tarjan(int i)
+{
+    int j;
+    DFN[i]=Low[i]=Index++;
+    InStack[i]=true;STACK[++top]=i;
+    for (int e=0;e<Edge[i].size();e++)
+    {
+        j=Edge[i][e];
+        if (DFN[j]==-1)
+        {
+            Tarjan(j);
+            Low[i]=min(Low[i],Low[j]);
+        }
+        else
+            if (InStack[j]) Low[i]=min(Low[i],DFN[j]);
+    }
+    if (DFN[i]==Low[i])
+    {
+        ComponentNumber++;
+        do{
+            j=STACK[top--];
+            InStack[j]=false;
+            Component[ComponentNumber].
+            push_back(j);
+            InComponent[j]=ComponentNumber;
+        }
+        while (j!=i);
+    }
+}
